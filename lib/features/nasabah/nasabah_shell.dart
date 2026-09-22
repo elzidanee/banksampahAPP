@@ -576,41 +576,46 @@ class _NasabahDashboardPageState extends State<NasabahDashboardPage> {
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.line),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: actions.map((item) {
-          return InkWell(
-            onTap: item.$4,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Column(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: item.$3.withValues(alpha: .1),
-                      borderRadius: BorderRadius.circular(12),
+          return Expanded(
+            child: InkWell(
+              onTap: item.$4,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: item.$3.withValues(alpha: .1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(item.$2, color: item.$3, size: 20),
                     ),
-                    child: Icon(item.$2, color: item.$3, size: 22),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    item.$1,
-                    style: const TextStyle(
-                      color: AppTheme.ink,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 6),
+                    Text(
+                      item.$1,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppTheme.ink,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
