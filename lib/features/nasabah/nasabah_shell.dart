@@ -24,12 +24,13 @@ class _NasabahShellState extends State<NasabahShell> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      const NasabahDashboardPage(),
+      NasabahDashboardPage(onNavigate: (i) => setState(() => _index = i)),
       const DepositPage(),
       const HistoryPage(),
       const RedeemPage(),
       const AccountPage(),
     ];
+
     return Scaffold(
       backgroundColor: AppTheme.bg,
       body: IndexedStack(index: _index, children: pages),
@@ -39,91 +40,79 @@ class _NasabahShellState extends State<NasabahShell> {
 
   Widget _buildBottomNav() {
     return Container(
-      color: Colors.transparent,
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(top: BorderSide(color: AppTheme.line, width: 1)),
+      ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 72,
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomCenter,
+          height: 62,
+          child: Row(
             children: [
-              // Dock Background Card
-              Container(
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppTheme.surface,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: AppTheme.line),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: .06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    _navItem(icon: Icons.home_rounded, label: 'Beranda', targetIndex: 0),
-                    _navItem(icon: Icons.receipt_long_rounded, label: 'Riwayat', targetIndex: 2),
-                    const SizedBox(width: 58), // Space for center floating Setor button
-                    _navItem(icon: Icons.card_giftcard_rounded, label: 'Hadiah', targetIndex: 3),
-                    _navItem(icon: Icons.person_rounded, label: 'Akun', targetIndex: 4),
-                  ],
-                ),
+              _navItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home_rounded,
+                label: 'Beranda',
+                targetIndex: 0,
               ),
-
-              // Center Floating Action Button: Setor Sampah
-              Positioned(
-                top: 0,
-                child: GestureDetector(
-                  onTap: () => setState(() => _index = 1),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 220),
-                        curve: Curves.easeOutBack,
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: AppTheme.primaryGradient,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.green.withValues(alpha: _index == 1 ? 0.45 : 0.28),
-                              blurRadius: _index == 1 ? 16 : 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                          border: Border.all(
-                            color: Colors.white,
-                            width: _index == 1 ? 3 : 2.5,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.recycling_rounded,
-                          color: Colors.white,
-                          size: 27,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Setor',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: _index == 1 ? FontWeight.w800 : FontWeight.w600,
-                          color: _index == 1 ? AppTheme.green : AppTheme.subtle,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _navItem(
+                icon: Icons.receipt_long_outlined,
+                activeIcon: Icons.receipt_long_rounded,
+                label: 'Riwayat',
+                targetIndex: 2,
+              ),
+              _centerSetorButton(),
+              _navItem(
+                icon: Icons.card_giftcard_outlined,
+                activeIcon: Icons.card_giftcard_rounded,
+                label: 'Hadiah',
+                targetIndex: 3,
+              ),
+              _navItem(
+                icon: Icons.person_outline_rounded,
+                activeIcon: Icons.person_rounded,
+                label: 'Akun',
+                targetIndex: 4,
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _centerSetorButton() {
+    final active = _index == 1;
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _index = 1),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: active ? AppTheme.greenDark : AppTheme.green,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'Setor',
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+                color: active ? AppTheme.green : AppTheme.subtle,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -131,6 +120,7 @@ class _NasabahShellState extends State<NasabahShell> {
 
   Widget _navItem({
     required IconData icon,
+    required IconData activeIcon,
     required String label,
     required int targetIndex,
   }) {
@@ -138,37 +128,24 @@ class _NasabahShellState extends State<NasabahShell> {
     return Expanded(
       child: InkWell(
         onTap: () => setState(() => _index = targetIndex),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: active ? AppTheme.greenLight : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  icon,
-                  color: active ? AppTheme.green : AppTheme.subtle,
-                  size: 21,
-                ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              active ? activeIcon : icon,
+              color: active ? AppTheme.green : AppTheme.subtle,
+              size: 22,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                color: active ? AppTheme.green : AppTheme.subtle,
               ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? AppTheme.green : AppTheme.subtle,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -176,80 +153,56 @@ class _NasabahShellState extends State<NasabahShell> {
 }
 
 // ---------------------------------------------------------------------------
-// Dashboard
+// Clean, Modern Dashboard for Nasabah
 // ---------------------------------------------------------------------------
+
 class NasabahDashboardPage extends StatefulWidget {
-  const NasabahDashboardPage({super.key});
+  final ValueChanged<int>? onNavigate;
+  const NasabahDashboardPage({super.key, this.onNavigate});
+
   @override
   State<NasabahDashboardPage> createState() => _NasabahDashboardPageState();
 }
 
-class _NasabahDashboardPageState extends State<NasabahDashboardPage>
-    with SingleTickerProviderStateMixin {
+class _NasabahDashboardPageState extends State<NasabahDashboardPage> {
   NasabahDashboard? _data;
   bool _loading = true;
   String? _error;
 
-  late final AnimationController _animCtrl;
-  late final Animation<double> _fade;
-
   @override
   void initState() {
     super.initState();
-    _animCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
-    _fade = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _load(retryOnFailure: true));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  @override
-  void dispose() { _animCtrl.dispose(); super.dispose(); }
-
-  Future<void> _load({bool retryOnFailure = false}) async {
-    setState(() { _loading = true; _error = null; });
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final repo = DashboardRepository(AuthScope.of(context).api);
       final data = await repo.nasabahSummary();
       if (!mounted) return;
       setState(() => _data = data);
       final saldo = _data?.saldoPoin;
-      if (saldo != null) await AuthScope.of(context).session.updateSaldo(saldo);
-      _animCtrl.forward(from: 0);
+      if (saldo != null) {
+        await AuthScope.of(context).session.updateSaldo(saldo);
+      }
     } on AppException catch (e) {
-      if (retryOnFailure && mounted) await _load();
-      else if (mounted) {
-        setState(() => _error = e.message);
-        await _showError(e.message, e.statusCode);
-      }
+      if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (retryOnFailure && mounted) await _load();
-      else if (mounted) {
-        const msg = 'Gagal memuat data dashboard.';
-        setState(() => _error = msg);
-        await _showError(msg, null);
-      }
+      if (mounted) setState(() => _error = 'Gagal memuat data dashboard.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _showError(String message, int? statusCode) async {
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Dashboard tidak dapat dimuat'),
-        content: Text(statusCode == null ? message : '\n\nStatus: '),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup')),
-          ElevatedButton(onPressed: () { Navigator.pop(ctx); _load(); }, child: const Text('Coba Lagi')),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final user = AuthScope.of(context).session.current;
+    final firstName = user?.nama?.split(' ').first ?? 'Nasabah';
+
     return Scaffold(
       backgroundColor: AppTheme.bg,
       body: SafeArea(
@@ -259,83 +212,150 @@ class _NasabahDashboardPageState extends State<NasabahDashboardPage>
           onRefresh: _load,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 20, 0, 18),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Halo, ${user?.nama?.split(' ').first ?? 'Nasabah'}',
-                            style: const TextStyle(color: AppTheme.ink, fontSize: 19, fontWeight: FontWeight.w800),
-                          ),
-                          const SizedBox(height: 3),
-                          const Text('Ayo pilah & setor sampah hari ini!',
-                            style: TextStyle(color: AppTheme.subtle, fontSize: 13)),
-                        ],
-                      ),
-                    ),
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppTheme.greenLight,
-                      backgroundImage: resolveImageUrl(user?.foto) != null
-                          ? NetworkImage(resolveImageUrl(user!.foto)!) : null,
-                      child: resolveImageUrl(user?.foto) == null
-                          ? const Icon(Icons.person_rounded, color: AppTheme.green, size: 22) : null,
-                    ),
-                  ],
-                ),
-              ),
-              StateContainer(
-                loading: _loading, error: _error, onRetry: _load, isEmpty: false,
-                child: _data == null ? const SizedBox.shrink() : FadeTransition(
-                  opacity: _fade,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _BalanceCard(poin: _data!.saldoPoin),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          _StatCard(
-                            label: 'Total Setor',
-                            value: '${_data!.totalSampahKg.toStringAsFixed(1)} kg',
-                            type: _StatType.setor,
-                          ),
-                          const SizedBox(width: 10),
-                          _StatCard(
-                            label: 'Poin Didapat',
-                            value: Formatters.poin(_data!.totalPoinDidapat),
-                            type: _StatType.poin,
-                          ),
-                          const SizedBox(width: 10),
-                          _StatCard(
-                            label: 'Penukaran',
-                            value: '${_data!.jumlahPenukaran}x',
-                            type: _StatType.tukar,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      _QuickBanner(
-                        icon: Icons.recycling_outlined, label: 'Lihat Katalog Sampah',
-                        subtitle: 'Cek jenis & nilai sampah',
-                        onTap: () => Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => const KategoriSampahPage())),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text('Transaksi Terakhir',
-                        style: TextStyle(color: AppTheme.ink, fontWeight: FontWeight.w700, fontSize: 15)),
-                      const SizedBox(height: 12),
-                      _buildDepositCard(),
-                      _buildRedeemCard(),
-                    ],
+              // Top Header Row
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppTheme.greenLight,
+                    backgroundImage: resolveImageUrl(user?.foto) != null
+                        ? NetworkImage(resolveImageUrl(user!.foto)!)
+                        : null,
+                    child: resolveImageUrl(user?.foto) == null
+                        ? const Icon(
+                            Icons.person_rounded,
+                            color: AppTheme.green,
+                            size: 20,
+                          )
+                        : null,
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Halo, $firstName',
+                          style: const TextStyle(
+                            color: AppTheme.ink,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        const Text(
+                          'Kelola tabungan sampah digitalmu',
+                          style: TextStyle(
+                            color: AppTheme.subtle,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Panduan Aplikasi',
+                    icon: const Icon(
+                      Icons.help_outline_rounded,
+                      color: AppTheme.subtle,
+                      size: 22,
+                    ),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OnboardingPage(isModal: true),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 18),
+
+              StateContainer(
+                loading: _loading,
+                error: _error,
+                onRetry: _load,
+                isEmpty: false,
+                child: _data == null
+                    ? const SizedBox.shrink()
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // 1. Digital Wallet Card
+                          _buildWalletCard(_data!.saldoPoin),
+
+                          const SizedBox(height: 16),
+
+                          // 2. Metrics summary row
+                          Row(
+                            children: [
+                              _metricItem(
+                                'Total Setor',
+                                '${_data!.totalSampahKg.toStringAsFixed(1)} kg',
+                                Icons.scale_outlined,
+                                AppTheme.green,
+                                AppTheme.greenLight,
+                              ),
+                              const SizedBox(width: 10),
+                              _metricItem(
+                                'Poin Masuk',
+                                Formatters.poin(_data!.totalPoinDidapat),
+                                Icons.savings_outlined,
+                                AppTheme.amber,
+                                AppTheme.amberLight,
+                              ),
+                              const SizedBox(width: 10),
+                              _metricItem(
+                                'Penukaran',
+                                '${_data!.jumlahPenukaran}x',
+                                Icons.redeem_outlined,
+                                AppTheme.blue,
+                                AppTheme.blueLight,
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 18),
+
+                          // 3. Quick Action Grid
+                          _buildQuickActionGrid(),
+
+                          const SizedBox(height: 22),
+
+                          // 4. Recent Transactions
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Aktivitas Terakhir',
+                                style: TextStyle(
+                                  color: AppTheme.ink,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => widget.onNavigate?.call(2),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: const Text(
+                                  'Lihat Semua',
+                                  style: TextStyle(fontSize: 12.5),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _buildRecentDepositCard(),
+                          _buildRecentRedeemCard(),
+                        ],
+                      ),
               ),
             ],
           ),
@@ -344,370 +364,645 @@ class _NasabahDashboardPageState extends State<NasabahDashboardPage>
     );
   }
 
-  Widget _buildDepositCard() {
-    final d = _data!.setorTerakhir;
-    if (d == null) return _txCard(title: 'Setoran Terakhir', icon: Icons.recycling_rounded,
-      gradient: AppTheme.primaryGradient,
-      rows: const [('Kode','-'),('Tanggal','-'),('Berat','-'),('Poin','-')],
-      status: ('Belum ada data', AppTheme.subtle),
-      viewAll: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryPage())));
-    final points = d.status == 'selesai' ? '${Formatters.poin(d.totalPoin)} Poin' : 'Belum diperoleh';
-    return _txCard(title: 'Setoran Terakhir', icon: Icons.recycling_rounded,
-      gradient: AppTheme.primaryGradient,
-      rows: [('Kode', d.kodeSetor),('Tanggal', Formatters.date(d.tanggal)),
-        ('Berat', '${d.totalBeratKg.toStringAsFixed(1)} kg'),('Poin', points)],
-      status: StatusStyle.setor(d.status),
-      viewAll: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryPage())));
-  }
-
-  Widget _buildRedeemCard() {
-    final r = _data!.tukarTerakhir;
-    if (r == null) return _txCard(title: 'Penukaran Terakhir', icon: Icons.swap_horiz_rounded,
-      gradient: AppTheme.blueGradient,
-      rows: const [('Kode','-'),('Tanggal','-'),('Hadiah','-'),('Poin Terpakai','-')],
-      status: ('Belum ada data', AppTheme.subtle),
-      viewAll: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RedeemPage(initialTab: 1))));
-    return _txCard(title: 'Penukaran Terakhir', icon: Icons.swap_horiz_rounded,
-      gradient: AppTheme.blueGradient,
-      rows: [('Kode', r.kodePenukaran),('Tanggal', Formatters.date(r.tanggal)),
-        ('Hadiah', r.namaHadiah ?? '-'),('Poin Terpakai', '${Formatters.poin(r.poinTerpakai)} Poin')],
-      status: StatusStyle.penukaran(r.status),
-      viewAll: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RedeemPage(initialTab: 1))));
-  }
-
-  Widget _txCard({
-    required String title, required IconData icon, required LinearGradient gradient,
-    required List<(String, String)> rows, required (String, Color) status, required VoidCallback viewAll,
-  }) => Container(
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: AppTheme.surface, borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: AppTheme.line), boxShadow: AppTheme.cardShadow,
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(children: [
-          Container(width: 34, height: 34, decoration: BoxDecoration(gradient: gradient, borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: Colors.white, size: 17)),
-          const SizedBox(width: 10),
-          Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppTheme.ink))),
-          TextButton(onPressed: viewAll,
-            style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-            child: const Text('Lihat Semua', style: TextStyle(fontSize: 12))),
-        ]),
-        const SizedBox(height: 12),
-        for (final row in rows) Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Row(children: [
-            SizedBox(width: 110, child: Text(row.$1, style: const TextStyle(color: AppTheme.subtle, fontSize: 13))),
-            Expanded(child: Text(row.$2, textAlign: TextAlign.right, maxLines: 2, overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.ink))),
-          ]),
-        ),
-        const SizedBox(height: 4),
-        Row(children: [
-          const Expanded(child: Text('Status', style: TextStyle(color: AppTheme.subtle, fontSize: 13))),
-          StatusChip(label: status.$1, color: status.$2),
-        ]),
-      ],
-    ),
-  );
-}
-
-// Balance card
-class _BalanceCard extends StatelessWidget {
-  final num? poin;
-  const _BalanceCard({required this.poin});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildWalletCard(num? poin) {
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: AppTheme.greenGlow,
+        gradient: AppTheme.darkCardGradient,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: .08)),
+        boxShadow: AppTheme.cardShadow,
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            top: -12,
-            right: -12,
-            child: Opacity(
-              opacity: 0.16,
-              child: Image.asset(
-                'assets/logo2.png',
-                width: 120,
-                height: 120,
-                fit: BoxFit.contain,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'SALDO POIN AKTIF',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
+                ),
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.verified_rounded,
+                      size: 12,
+                      color: AppTheme.greenAccent,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Terverifikasi',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            Formatters.poin(poin),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+              height: 1.1,
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 4),
+          Text(
+            'Dapat ditukarkan dengan sembako & reward',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: .65),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
             children: [
-              Row(children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .2),
-                    borderRadius: BorderRadius.circular(8),
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.green,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(42),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 0,
                   ),
-                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.stars_rounded, size: 13, color: Colors.white),
-                    SizedBox(width: 4),
-                    Text('Total Poin', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
-                  ]),
+                  onPressed: () => widget.onNavigate?.call(1),
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: const Text(
+                    'Setor Sampah',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ]),
-              const SizedBox(height: 12),
-              Text(Formatters.poin(poin),
-                style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800, height: 1)),
-              const SizedBox(height: 4),
-              Text('poin terkumpul',
-                style: TextStyle(color: Colors.white.withValues(alpha: .75), fontSize: 13)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: .25),
+                      width: 1,
+                    ),
+                    minimumSize: const Size.fromHeight(42),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () => widget.onNavigate?.call(3),
+                  icon: const Icon(Icons.card_giftcard_outlined, size: 17),
+                  label: const Text(
+                    'Tukar Hadiah',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
       ),
     );
   }
-}
 
-enum _StatType { setor, poin, tukar }
-
-// Stat card with clean professional icon badges
-class _StatCard extends StatelessWidget {
-  final String label, value;
-  final _StatType type;
-  const _StatCard({required this.label, required this.value, required this.type});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _metricItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+    Color bgColor,
+  ) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppTheme.line),
-          boxShadow: AppTheme.cardShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 34,
-              height: 34,
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: switch (type) {
-                  _StatType.setor => AppTheme.greenLight,
-                  _StatType.poin => AppTheme.amberLight,
-                  _StatType.tukar => AppTheme.blueLight,
-                },
-                borderRadius: BorderRadius.circular(10),
+                color: bgColor,
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                switch (type) {
-                  _StatType.setor => Icons.recycling_rounded,
-                  _StatType.poin => Icons.monetization_on_rounded,
-                  _StatType.tukar => Icons.redeem_rounded,
-                },
-                size: 18,
-                color: switch (type) {
-                  _StatType.setor => AppTheme.green,
-                  _StatType.poin => AppTheme.amber,
-                  _StatType.tukar => AppTheme.blue,
-                },
-              ),
+              child: Icon(icon, size: 16, color: color),
             ),
             const SizedBox(height: 10),
             Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppTheme.ink),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.ink,
+              ),
             ),
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(color: AppTheme.subtle, fontSize: 10, fontWeight: FontWeight.w500),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.subtle,
+                fontSize: 11,
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-// Quick action banner
-class _QuickBanner extends StatelessWidget {
-  final IconData icon;
-  final String label, subtitle;
-  final VoidCallback? onTap;
-  const _QuickBanner({required this.icon, required this.label, required this.subtitle, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppTheme.greenLight, borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: onTap, borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: AppTheme.green.withValues(alpha: .3))),
-          child: Row(children: [
-            Container(width: 38, height: 38, decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, color: Colors.white, size: 19)),
-            const SizedBox(width: 12),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.ink)),
-              Text(subtitle, style: const TextStyle(color: AppTheme.subtle, fontSize: 12)),
-            ])),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 13, color: AppTheme.green),
-          ]),
+  Widget _buildQuickActionGrid() {
+    final actions = [
+      (
+        'Setor Sampah',
+        Icons.recycling_rounded,
+        AppTheme.green,
+        () => widget.onNavigate?.call(1),
+      ),
+      (
+        'Katalog Sampah',
+        Icons.inventory_2_outlined,
+        AppTheme.blue,
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const KategoriSampahPage()),
         ),
+      ),
+      (
+        'Tukar Reward',
+        Icons.card_giftcard_rounded,
+        AppTheme.amber,
+        () => widget.onNavigate?.call(3),
+      ),
+      (
+        'Panduan',
+        Icons.menu_book_rounded,
+        const Color(0xFF673AB7),
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const OnboardingPage(isModal: true),
+          ),
+        ),
+      ),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.line),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: actions.map((item) {
+          return InkWell(
+            onTap: item.$4,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Column(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: item.$3.withValues(alpha: .1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(item.$2, color: item.$3, size: 22),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.$1,
+                    style: const TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildRecentDepositCard() {
+    final d = _data!.setorTerakhir;
+    if (d == null) {
+      return _emptyActivityTile('Belum ada setoran sampah');
+    }
+    final status = StatusStyle.setor(d.status);
+    final points = d.status == 'selesai'
+        ? '+${Formatters.poin(d.totalPoin)} Poin'
+        : 'Menunggu validasi';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.greenLight,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.recycling_rounded,
+                  color: AppTheme.green,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  d.kodeSetor,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: AppTheme.ink,
+                  ),
+                ),
+              ),
+              StatusChip(label: status.$1, color: status.$2),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${Formatters.date(d.tanggal)} • ${Formatters.kg(d.totalBeratKg)} kg',
+                style: const TextStyle(color: AppTheme.subtle, fontSize: 12),
+              ),
+              Text(
+                points,
+                style: const TextStyle(
+                  color: AppTheme.green,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12.5,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentRedeemCard() {
+    final r = _data!.tukarTerakhir;
+    if (r == null) {
+      return _emptyActivityTile('Belum ada penukaran hadiah');
+    }
+    final status = StatusStyle.penukaran(r.status);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.blueLight,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.redeem_rounded,
+                  color: AppTheme.blue,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  r.namaHadiah ?? r.kodePenukaran,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: AppTheme.ink,
+                  ),
+                ),
+              ),
+              StatusChip(label: status.$1, color: status.$2),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                Formatters.date(r.tanggal),
+                style: const TextStyle(color: AppTheme.subtle, fontSize: 12),
+              ),
+              Text(
+                '-${Formatters.poin(r.poinTerpakai)} Poin',
+                style: const TextStyle(
+                  color: AppTheme.red,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12.5,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyActivityTile(String label) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.line),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline_rounded, color: AppTheme.subtleLighter, size: 18),
+          const SizedBox(width: 10),
+          Text(label, style: const TextStyle(color: AppTheme.subtle, fontSize: 12.5)),
+        ],
       ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Account Page
+// Clean Account Page
 // ---------------------------------------------------------------------------
+
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final user = AuthScope.of(context).session.current;
+
     return Scaffold(
       backgroundColor: AppTheme.bg,
+      appBar: AppBar(
+        title: const Text('Profil Saya'),
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
-        bottom: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           children: [
-            // Profile header
+            // User Card
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(22),
-                boxShadow: AppTheme.greenGlow,
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.line),
               ),
-              child: Row(children: [
-                Container(
-                  padding: const EdgeInsets.all(2.5),
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                  child: CircleAvatar(
-                    radius: 30, backgroundColor: AppTheme.greenLight,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: AppTheme.greenLight,
                     backgroundImage: resolveImageUrl(user?.foto) != null
-                        ? NetworkImage(resolveImageUrl(user!.foto)!) : null,
+                        ? NetworkImage(resolveImageUrl(user!.foto)!)
+                        : null,
                     child: resolveImageUrl(user?.foto) == null
-                        ? const Icon(Icons.person_rounded, color: AppTheme.green, size: 26) : null,
+                        ? const Icon(
+                            Icons.person_rounded,
+                            color: AppTheme.green,
+                            size: 28,
+                          )
+                        : null,
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(user?.nama ?? '-',
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.white)),
-                    const SizedBox(height: 2),
-                    Text('@${user?.username ?? '-'}',
-                      style: TextStyle(color: Colors.white.withValues(alpha: .75), fontSize: 13)),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .2), borderRadius: BorderRadius.circular(6)),
-                      child: Text(user?.role ?? '-',
-                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.nama ?? 'Nasabah',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: AppTheme.ink,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '@${user?.username ?? '-'}',
+                          style: const TextStyle(
+                            color: AppTheme.subtle,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.greenLight,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'NASABAH AKTIF',
+                            style: TextStyle(
+                              color: AppTheme.green,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                )),
-              ]),
+                  ),
+                ],
+              ),
             ),
+
             const SizedBox(height: 16),
-            // Info card
+
+            // Profile info details
             Container(
-              decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppTheme.line), boxShadow: AppTheme.cardShadow),
-              child: Column(children: [
-                _infoTile(Icons.location_on_rounded, 'Alamat', user?.alamat ?? '-'),
-                Divider(color: AppTheme.line, height: 1, indent: 56),
-                _infoTile(Icons.phone_rounded, 'Telepon', user?.telp ?? '-'),
-                Divider(color: AppTheme.line, height: 1, indent: 56),
-                _infoTile(Icons.stars_rounded, 'Saldo Poin',
-                  user?.saldoPoin != null ? '${Formatters.poin(user?.saldoPoin)} poin' : '-',
-                  valueColor: AppTheme.green),
-              ]),
-            ),
-            const SizedBox(height: 14),
-            // Panduan Aplikasi
-            Container(
-              decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppTheme.line), boxShadow: AppTheme.cardShadow),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                leading: Container(width: 34, height: 34,
-                  decoration: BoxDecoration(color: AppTheme.greenLight, borderRadius: BorderRadius.circular(9)),
-                  child: const Icon(Icons.menu_book_rounded, color: AppTheme.green, size: 18)),
-                title: const Text('Panduan Aplikasi', style: TextStyle(color: AppTheme.ink, fontWeight: FontWeight.w600, fontSize: 15)),
-                subtitle: const Text('Lihat kembali alur & pengenalan aplikasi', style: TextStyle(color: AppTheme.subtle, fontSize: 12)),
-                trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.subtle),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const OnboardingPage(isModal: true)),
-                ),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.line),
+              ),
+              child: Column(
+                children: [
+                  _infoItem(
+                    Icons.location_on_outlined,
+                    'Alamat',
+                    user?.alamat ?? 'Belum diatur',
+                  ),
+                  const Divider(color: AppTheme.line, height: 1, indent: 50),
+                  _infoItem(
+                    Icons.phone_outlined,
+                    'Nomor Telepon',
+                    user?.telp ?? '-',
+                  ),
+                  const Divider(color: AppTheme.line, height: 1, indent: 50),
+                  _infoItem(
+                    Icons.savings_outlined,
+                    'Total Poin',
+                    user?.saldoPoin != null
+                        ? '${Formatters.poin(user?.saldoPoin)} Poin'
+                        : '0 Poin',
+                    isHighlight: true,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 14),
-            // Logout
+
+            const SizedBox(height: 16),
+
+            // Menu actions
             Container(
-              decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppTheme.line), boxShadow: AppTheme.cardShadow),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                leading: Container(width: 34, height: 34,
-                  decoration: BoxDecoration(color: AppTheme.redLight, borderRadius: BorderRadius.circular(9)),
-                  child: const Icon(Icons.logout_rounded, color: AppTheme.red, size: 17)),
-                title: const Text('Keluar', style: TextStyle(color: AppTheme.red, fontWeight: FontWeight.w600, fontSize: 15)),
-                trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.subtle),
-                onTap: () => _confirmLogout(context),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.line),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(
+                      Icons.menu_book_rounded,
+                      color: AppTheme.green,
+                      size: 20,
+                    ),
+                    title: const Text(
+                      'Panduan Penggunaan',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.ink,
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppTheme.subtle,
+                    ),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OnboardingPage(isModal: true),
+                      ),
+                    ),
+                  ),
+                  const Divider(color: AppTheme.line, height: 1, indent: 50),
+                  ListTile(
+                    leading: const Icon(
+                      Icons.logout_rounded,
+                      color: AppTheme.red,
+                      size: 20,
+                    ),
+                    title: const Text(
+                      'Keluar dari Akun',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.red,
+                      ),
+                    ),
+                    onTap: () => _confirmLogout(context),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            const Center(child: Text('Bank Sampah Peduli v1.0.0',
-              style: TextStyle(color: AppTheme.subtleLighter, fontSize: 11))),
           ],
         ),
       ),
     );
   }
 
-  Widget _infoTile(IconData icon, String label, String value, {Color? valueColor}) {
+  Widget _infoItem(
+    IconData icon,
+    String label,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      child: Row(children: [
-        Container(width: 34, height: 34,
-          decoration: BoxDecoration(color: AppTheme.greenLight, borderRadius: BorderRadius.circular(9)),
-          child: Icon(icon, color: AppTheme.green, size: 17)),
-        const SizedBox(width: 12),
-        Expanded(child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: const TextStyle(color: AppTheme.subtle, fontSize: 11)),
-            const SizedBox(height: 2),
-            Text(value, style: TextStyle(color: valueColor ?? AppTheme.ink,
-              fontWeight: FontWeight.w600, fontSize: 14)),
-          ],
-        )),
-      ]),
+      child: Row(
+        children: [
+          Icon(icon, color: isHighlight ? AppTheme.green : AppTheme.subtle, size: 20),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(color: AppTheme.subtle, fontSize: 11),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: isHighlight ? AppTheme.green : AppTheme.ink,
+                    fontWeight: isHighlight ? FontWeight.w700 : FontWeight.w600,
+                    fontSize: 13.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -715,14 +1010,26 @@ class AccountPage extends StatelessWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Keluar dari Akun', style: TextStyle(fontWeight: FontWeight.w700)),
-        content: const Text('Anda yakin ingin keluar dari akun ini?'),
+        title: const Text(
+          'Keluar dari Akun',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        ),
+        content: const Text(
+          'Anda yakin ingin mengakhiri sesi masuk pada perangkat ini?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.red,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Keluar')),
+            child: const Text('Keluar'),
+          ),
         ],
       ),
     );
@@ -730,6 +1037,8 @@ class AccountPage extends StatelessWidget {
     await AuthScope.of(context).session.clearSession();
     if (!context.mounted) return;
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginPage()), (_) => false);
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (_) => false,
+    );
   }
 }

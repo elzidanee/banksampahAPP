@@ -96,9 +96,10 @@ class _AdminShellState extends State<AdminShell> {
                 margin: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: AppTheme.greenGlow,
+                  gradient: AppTheme.darkCardGradient,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withValues(alpha: .08)),
+                  boxShadow: AppTheme.cardShadow,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

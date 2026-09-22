@@ -132,7 +132,7 @@ class _Message extends StatelessWidget {
   }
 }
 
-/// Colored status chip, e.g. "Menunggu Konfirmasi" / "Selesai".
+/// Colored status chip with clean indicator dot.
 class StatusChip extends StatelessWidget {
   final String label;
   final Color color;
@@ -142,18 +142,33 @@ class StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: .14),
-        borderRadius: BorderRadius.circular(6),
+        color: color.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: .22), width: 1),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 5.5),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

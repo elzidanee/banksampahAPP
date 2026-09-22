@@ -1,5 +1,4 @@
 import 'dart:async' as async;
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +18,7 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
       systemNavigationBarColor: AppTheme.surface,
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
@@ -57,7 +56,7 @@ class _SampahBankAppState extends State<SampahBankApp> {
 }
 
 // ---------------------------------------------------------------------------
-// Splash Page
+// Clean, Professional Splash Screen (No AI Slop / No Particle Canvas)
 // ---------------------------------------------------------------------------
 
 class SplashPage extends StatefulWidget {
@@ -66,29 +65,13 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
-  static const _minDuration = Duration(seconds: 3);
+class _SplashPageState extends State<SplashPage>
+    with SingleTickerProviderStateMixin {
+  static const _minDuration = Duration(milliseconds: 1200);
 
-  // Logo animations
-  late final AnimationController _logoCtrl;
-  late final Animation<double> _logoScale;
-  late final Animation<double> _logoFade;
-
-  // Rings pulse
-  late final AnimationController _ringCtrl;
-  late final Animation<double> _ring1;
-  late final Animation<double> _ring2;
-
-  // Text slide up
-  late final AnimationController _textCtrl;
-  late final Animation<Offset> _textSlide;
-  late final Animation<double> _textFade;
-
-  // Floating particles
-  late final AnimationController _particleCtrl;
-
-  // Progress bar
-  late final AnimationController _progressCtrl;
+  late final AnimationController _animCtrl;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
 
   late DateTime _startedAt;
   bool _hasError = false;
@@ -99,50 +82,24 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     super.initState();
     _startedAt = DateTime.now();
 
-    // Logo: springs in
-    _logoCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-    _logoScale = Tween<double>(begin: 0.6, end: 1.0)
-        .animate(CurvedAnimation(parent: _logoCtrl, curve: Curves.elasticOut));
-    _logoFade = CurvedAnimation(parent: _logoCtrl, curve: const Interval(0, 0.4, curve: Curves.easeIn));
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _fade = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.08),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic));
 
-    // Ring pulses (staggered)
-    _ringCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
-    _ring1 = Tween<double>(begin: 0.7, end: 1.35)
-        .animate(CurvedAnimation(parent: _ringCtrl, curve: Curves.easeOut));
-    _ring2 = Tween<double>(begin: 0.7, end: 1.65)
-        .animate(CurvedAnimation(parent: _ringCtrl,
-            curve: const Interval(0.2, 1.0, curve: Curves.easeOut)));
-
-    // Text slides up
-    _textCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
-    _textSlide = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _textCtrl, curve: Curves.easeOutCubic));
-    _textFade = CurvedAnimation(parent: _textCtrl, curve: Curves.easeIn);
-
-    // Particles spin forever
-    _particleCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 8))
-      ..repeat();
-
-    // Progress bar fills over minDuration
-    _progressCtrl = AnimationController(vsync: this, duration: _minDuration)
-      ..forward();
-
-    // Chain: logo -> ring -> text
-    _logoCtrl.forward().then((_) {
-      _ringCtrl.forward();
-      _textCtrl.forward();
-    });
+    _animCtrl.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeApp());
   }
 
   @override
   void dispose() {
-    _logoCtrl.dispose();
-    _ringCtrl.dispose();
-    _textCtrl.dispose();
-    _particleCtrl.dispose();
-    _progressCtrl.dispose();
+    _animCtrl.dispose();
     super.dispose();
   }
 
@@ -203,14 +160,16 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     PageRouteBuilder(
       pageBuilder: (_, __, ___) => page,
       transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-      transitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 350),
     ),
   );
 
   void _retry() {
     _startedAt = DateTime.now();
-    _progressCtrl.forward(from: 0);
-    setState(() { _hasError = false; _errorMessage = null; });
+    setState(() {
+      _hasError = false;
+      _errorMessage = null;
+    });
     _initializeApp();
   }
 
@@ -222,195 +181,69 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   Widget _buildSplash() {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF1E8A40),
-              Color(0xFF2E9E50),
-              Color(0xFF3DB866),
-              Color(0xFF1A6B32),
-            ],
-            stops: [0.0, 0.35, 0.70, 1.0],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Floating particles background
-            AnimatedBuilder(
-              animation: _particleCtrl,
-              builder: (_, __) => CustomPaint(
-                size: MediaQuery.of(context).size,
-                painter: _ParticlePainter(_particleCtrl.value),
-              ),
-            ),
-
-            // Center content
-            Center(
+      backgroundColor: AppTheme.bgWhite,
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fade,
+            child: SlideTransition(
+              position: _slide,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Rings + Logo
-                  SizedBox(
-                    width: 200, height: 200,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer ring 2 (slower)
-                        AnimatedBuilder(
-                          animation: _ring2,
-                          builder: (_, __) => Transform.scale(
-                            scale: _ring2.value,
-                            child: Opacity(
-                              opacity: (1.0 - (_ring2.value - 0.7) / 0.95).clamp(0.0, 0.4),
-                              child: Container(
-                                width: 160, height: 160,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 1.2),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Inner ring 1
-                        AnimatedBuilder(
-                          animation: _ring1,
-                          builder: (_, __) => Transform.scale(
-                            scale: _ring1.value,
-                            child: Opacity(
-                              opacity: (1.0 - (_ring1.value - 0.7) / 0.65).clamp(0.0, 0.55),
-                              child: Container(
-                                width: 130, height: 130,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        // White circle backdrop
-                        Container(
-                          width: 110, height: 110,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: .2),
-                          ),
-                        ),
-                        // Logo
-                        FadeTransition(
-                          opacity: _logoFade,
-                          child: ScaleTransition(
-                            scale: _logoScale,
-                            child: Container(
-                              width: 96, height: 96,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: .18),
-                                    blurRadius: 24,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Image.asset('assets/logo2.png', fit: BoxFit.contain),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                  // App Brand Logo
+                  Container(
+                    width: 88,
+                    height: 88,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: AppTheme.line),
+                      boxShadow: AppTheme.cardShadow,
+                    ),
+                    child: Image.asset(
+                      'assets/logo2.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Brand Name
+                  const Text(
+                    'Bank Sampah',
+                    style: TextStyle(
+                      color: AppTheme.ink,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Pilah Sampah, Kumpulkan Poin',
+                    style: TextStyle(
+                      color: AppTheme.subtle,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 56),
 
-                  // App name + tagline
-                  SlideTransition(
-                    position: _textSlide,
-                    child: FadeTransition(
-                      opacity: _textFade,
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Bank Sampah',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                              shadows: [
-                                Shadow(color: Color(0x40000000), blurRadius: 8, offset: Offset(0, 2)),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: .18),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.white.withValues(alpha: .35)),
-                            ),
-                            child: const Text(
-                              'Sampah Bernilai • Bumi Lestari',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                  // Subtle spinner
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppTheme.green,
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Bottom progress bar
-            Positioned(
-              left: 0, right: 0, bottom: 48,
-              child: FadeTransition(
-                opacity: _textFade,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 64),
-                  child: Column(
-                    children: [
-                      AnimatedBuilder(
-                        animation: _progressCtrl,
-                        builder: (_, __) => ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: _progressCtrl.value,
-                            backgroundColor: Colors.white.withValues(alpha: .25),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                            minHeight: 3,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Memuat aplikasi...',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: .7),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -418,101 +251,66 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   Widget _buildErrorScreen() {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1E8A40), Color(0xFF2E9E50), Color(0xFF1A6B32)],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 80, height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: .2),
-                      shape: BoxShape.circle,
+      backgroundColor: AppTheme.bgWhite,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: AppTheme.redLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.wifi_off_rounded,
+                    size: 32,
+                    color: AppTheme.red,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Koneksi Terputus',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.ink,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _errorMessage ?? 'Periksa jaringan internet Anda.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppTheme.subtle,
+                    fontSize: 13.5,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  width: 180,
+                  height: 46,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.green,
+                      foregroundColor: Colors.white,
                     ),
-                    child: const Icon(Icons.wifi_off_rounded, size: 38, color: Colors.white),
+                    onPressed: _retry,
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: const Text('Coba Lagi'),
                   ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Tidak Dapat Terhubung',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _errorMessage ?? 'Periksa koneksi internet Anda.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white.withValues(alpha: .8), fontSize: 14, height: 1.5),
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppTheme.green,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0,
-                      ),
-                      onPressed: _retry,
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Coba Lagi', style: TextStyle(fontWeight: FontWeight.w700)),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
-}
-
-// ---------------------------------------------------------------------------
-// Particle Painter
-// ---------------------------------------------------------------------------
-class _ParticlePainter extends CustomPainter {
-  final double progress;
-  static final _rng = math.Random(42);
-  static final _particles = List.generate(18, (i) => _Particle(
-    x: _rng.nextDouble(),
-    y: _rng.nextDouble(),
-    size: 3 + _rng.nextDouble() * 8,
-    speed: 0.03 + _rng.nextDouble() * 0.07,
-    phase: _rng.nextDouble(),
-  ));
-
-  const _ParticlePainter(this.progress);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    for (final p in _particles) {
-      final angle = (progress * p.speed * math.pi * 2) + p.phase * math.pi * 2;
-      final dx = p.x * size.width + math.cos(angle) * 18;
-      final dy = (p.y + progress * p.speed * 0.5) % 1.0 * size.height;
-      final opacity = (0.08 + math.sin(angle) * 0.05).clamp(0.03, 0.15);
-      paint.color = Colors.white.withValues(alpha: opacity);
-      canvas.drawCircle(Offset(dx, dy), p.size, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _ParticlePainter old) => old.progress != progress;
-}
-
-class _Particle {
-  final double x, y, size, speed, phase;
-  const _Particle({required this.x, required this.y, required this.size, required this.speed, required this.phase});
 }

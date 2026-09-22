@@ -68,11 +68,12 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
               children: [
                 // 1. Profile Hero Card
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(22),
-                    boxShadow: AppTheme.greenGlow,
+                    gradient: AppTheme.darkCardGradient,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: Colors.white.withValues(alpha: .08)),
+                    boxShadow: AppTheme.cardShadow,
                   ),
                   child: Column(
                     children: [

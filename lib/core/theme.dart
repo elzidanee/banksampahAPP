@@ -2,89 +2,90 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-/// Central visual system - light, fresh, eco-friendly UI.
+/// Central visual system - clean, authentic, human-crafted modern UI.
 class AppTheme {
   AppTheme._();
 
-  // Core greens
-  static const Color green = Color(0xFF2E9E50);
-  static const Color greenDark = Color(0xFF1E7A3C);
-  static const Color greenLight = Color(0xFFE8F5ED);
-  static const Color greenMid = Color(0xFF3DB866);
-  static const Color greenAccent = Color(0xFF4CD97B);
+  // Refined emerald / forest green palette (anti-slop, clean and natural)
+  static const Color green = Color(0xFF16A34A); // Emerald 600
+  static const Color greenDark = Color(0xFF15803D); // Emerald 700
+  static const Color greenDeep = Color(0xFF14532D); // Emerald 900
+  static const Color greenLight = Color(0xFFF0FDF4); // Emerald 50
+  static const Color greenBorder = Color(0xFFBBF7D0); // Emerald 200
+  static const Color greenMid = Color(0xFF22C55E); // Emerald 500
+  static const Color greenAccent = Color(0xFF4ADE80);
 
-  // Accent colors
-  static const Color amber = Color(0xFFE09000);
-  static const Color amberLight = Color(0xFFFFF3D6);
-  static const Color blue = Color(0xFF1A7FBA);
-  static const Color blueLight = Color(0xFFE3F2FD);
-  static const Color red = Color(0xFFD93025);
-  static const Color redLight = Color(0xFFFDECEB);
+  // Functional accent colors
+  static const Color amber = Color(0xFFD97706); // Amber 600
+  static const Color amberLight = Color(0xFFFEF3C7); // Amber 100
+  static const Color blue = Color(0xFF2563EB); // Blue 600
+  static const Color blueLight = Color(0xFFEFF6FF); // Blue 50
+  static const Color red = Color(0xFFDC2626); // Red 600
+  static const Color redLight = Color(0xFFFEF2F2); // Red 50
 
-  // Text colors
-  static const Color ink = Color(0xFF111827);
-  static const Color inkMedium = Color(0xFF374151);
-  static const Color subtle = Color(0xFF6B7280);
-  static const Color subtleLighter = Color(0xFF9CA3AF);
+  // Neutral slate text hierarchy
+  static const Color ink = Color(0xFF0F172A); // Slate 900
+  static const Color inkMedium = Color(0xFF334155); // Slate 700
+  static const Color subtle = Color(0xFF64748B); // Slate 500
+  static const Color subtleLighter = Color(0xFF94A3B8); // Slate 400
 
-  // Background / Surface
-  static const Color bg = Color(0xFFF4F7F5);
+  // Surfaces & Backgrounds
+  static const Color bg = Color(0xFFF8FAFC); // Slate 50 - pristine neutral
   static const Color bgWhite = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceElevated = Color(0xFFF0F4F1);
-  static const Color surfaceHigh = Color(0xFFE8EEE9);
-  static const Color line = Color(0xFFE5EBE6);
-  static const Color lineStrong = Color(0xFFD1D9D3);
+  static const Color surfaceElevated = Color(0xFFF1F5F9); // Slate 100
+  static const Color surfaceHigh = Color(0xFFE2E8F0);
+  static const Color line = Color(0xFFE2E8F0); // Slate 200 - crisp 1px border
+  static const Color lineStrong = Color(0xFFCBD5E1); // Slate 300
 
-  // Gradients
+  // Modern subtle gradients
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF3DB866), Color(0xFF1E7A3C)],
+    colors: [Color(0xFF16A34A), Color(0xFF15803D)],
+  );
+
+  static const LinearGradient darkCardGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0F291E), Color(0xFF081C14)],
   );
 
   static const LinearGradient bgGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFFECF5EE), Color(0xFFF4F7F5)],
+    colors: [Color(0xFFF8FAFC), Color(0xFFF1F5F9)],
   );
 
   static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF2E9E50), Color(0xFF1E7A3C)],
+    colors: [Color(0xFF16A34A), Color(0xFF15803D)],
   );
 
   static const LinearGradient amberGradient = LinearGradient(
-    colors: [Color(0xFFF5A623), Color(0xFFE09000)],
+    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
   );
 
   static const LinearGradient blueGradient = LinearGradient(
-    colors: [Color(0xFF2196F3), Color(0xFF1565C0)],
+    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
   );
 
-  // Shadows
-  static List<BoxShadow> greenGlow = [
+  // Clean, realistic shadows (no harsh artificial glowing halos)
+  static List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: Color(0xFF2E9E50).withValues(alpha: .25),
-      blurRadius: 20,
-      spreadRadius: -4,
-      offset: Offset(0, 6),
+      color: const Color(0xFF0F172A).withValues(alpha: .04),
+      blurRadius: 8,
+      offset: const Offset(0, 2),
+    ),
+    BoxShadow(
+      color: const Color(0xFF0F172A).withValues(alpha: .02),
+      blurRadius: 2,
+      offset: const Offset(0, 1),
     ),
   ];
 
-  static List<BoxShadow> cardShadow = [
-    BoxShadow(
-      color: Color(0xFF1A3A23).withValues(alpha: .08),
-      blurRadius: 16,
-      offset: Offset(0, 4),
-    ),
-    BoxShadow(
-      color: Color(0xFF1A3A23).withValues(alpha: .04),
-      blurRadius: 4,
-      offset: Offset(0, 1),
-    ),
-  ];
+  static List<BoxShadow> greenGlow = cardShadow;
 
   static ThemeData theme() {
     return ThemeData(
@@ -104,19 +105,19 @@ class AppTheme {
         backgroundColor: bgWhite,
         foregroundColor: ink,
         elevation: 0,
-        scrolledUnderElevation: 0.5,
+        scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        shadowColor: const Color(0x14000000),
+        shadowColor: Colors.transparent,
         centerTitle: false,
         titleTextStyle: GoogleFonts.poppins(
           color: ink,
-          fontSize: 17,
+          fontSize: 16,
           fontWeight: FontWeight.w700,
         ),
-        iconTheme: const IconThemeData(color: ink),
+        iconTheme: const IconThemeData(color: ink, size: 22),
       ),
       textTheme: GoogleFonts.poppinsTextTheme(const TextTheme(
-        headlineSmall: TextStyle(color: ink, fontWeight: FontWeight.w800),
+        headlineSmall: TextStyle(color: ink, fontWeight: FontWeight.w700),
         titleLarge: TextStyle(color: ink, fontWeight: FontWeight.w700),
         titleMedium: TextStyle(color: ink, fontWeight: FontWeight.w600),
         bodyLarge: TextStyle(color: inkMedium),
@@ -128,69 +129,76 @@ class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: line),
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: line, width: 1),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surfaceElevated,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        fillColor: surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: line),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: line, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: line),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: line, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: green, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: red),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: red, width: 1),
         ),
-        hintStyle: const TextStyle(color: subtleLighter, fontSize: 14),
-        labelStyle: const TextStyle(color: subtle, fontSize: 14),
+        hintStyle: const TextStyle(color: subtleLighter, fontSize: 13.5),
+        labelStyle: const TextStyle(color: subtle, fontSize: 13.5),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: green,
           foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size.fromHeight(48),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          textStyle: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
           elevation: 0,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: green,
-          side: const BorderSide(color: green),
-          minimumSize: const Size.fromHeight(48),
+          side: const BorderSide(color: line, width: 1),
+          minimumSize: const Size.fromHeight(46),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
           ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: green),
+        style: TextButton.styleFrom(
+          foregroundColor: green,
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: ink,
-        contentTextStyle: const TextStyle(color: Colors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        contentTextStyle: const TextStyle(color: Colors.white, fontSize: 13),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: surfaceElevated,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        labelStyle: const TextStyle(fontSize: 11, color: inkMedium),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: line),
+        ),
+        labelStyle: const TextStyle(fontSize: 11.5, color: inkMedium),
       ),
       dividerTheme: const DividerThemeData(color: line, space: 1),
       navigationBarTheme: NavigationBarThemeData(
@@ -199,7 +207,7 @@ class AppTheme {
         labelTextStyle: const WidgetStatePropertyAll(
           TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: ink),
         ),
-        iconTheme: WidgetStatePropertyAll(
+        iconTheme: const WidgetStatePropertyAll(
           IconThemeData(color: subtle),
         ),
       ),
@@ -211,8 +219,8 @@ class AppTheme {
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
       ),
     );
   }
